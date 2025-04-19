@@ -205,18 +205,179 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="7e66d87ac6a125d4b992844ccd5183b5e7a4d3d191764784b49a3de7f7bfbfb6">dbcf008ccb9124260027a917e27c9e443f9cbe72748f67473869e496ec9ac6ca672b1f8577cfd2d0df16f70abdf15be5ba9386d1cedd107947b0538a5492e865cfcc2b30fb9a7f3899a70bccd923f5917513e2a6e9055577f9d9e6d20a3546ac106fdd5ecd9b3bf63e60e50434075d5cd1ef1e6abe07eabb544789a4534b5ac4fb671a3853b0c22f74e326ea883f547ebee03f0f80af76b4812cf879cf7e2a5208afeec70e38657e34fda9eeecab847101e2a99b9752b24a4dcab3d955a1d88125ec0aebd0f92534b281bf7a6940da8b4e430d8d29d0bab633d5206d2459769a5f32db07c0a154ec73987931ebf8dc6b95ac0a16ed27366dc24f275694df81b56dfac7f160177ed0ed810c0e98cb50f8adba12357733551d8f3f74a2fd2d6d4b34dc9554755c04dca141a3b0628201c5779bb0cead9820e93ffea7e3604d2b1698fd025a882880c9c1f5ee4c8221dec3b0845851a73f71c9744a245092fd809c76e6a1f5caf2d85f7ac2e845ad20291433b716e9236befbd46dd806b6b7bace05c67ab467894ef758191987fc29fd0a607af53b999d2a62e31733add0aed85c6b6877e5a186b6c63635b8b2817af8ebcfb28e02f0488e249719416a870c975a0bec260b619a9fc3bff77533255d623fb1ec799cb105e34477c62293194eba607efdcc1622d36b038febb93a68ee3d639459987323808b005e49c9c09a138b75ec4507901971f1c1dd8329ba35fe6a3cfa8f7b99c929ddefe215732478115c6fbe1ddbfed2487da9ddecfaf61700cfd0c78b22c544e0b6fc57391af8e11f36079ca8adbbb80f98cc3a81630c779e1b3529bf12ded6aee6a9bb19748e6f4a9e7eb28e84440d546fbc50e95842c8284098e7bdf864666dd71eda62e539e3e434f6ee4ca6e339534d0b29e814d10089ff10f8514dcc827344d08a2cda266455d944605b3b63731afe2f797ecb0e9e130600f50fb30c7d6e7772cd763efdd716f2b73ae70e106c3b639c683359095fafa40a74763198d9344963bf5594e285123bb0277bcf5cf630c9d1865c9e28a35d877ef3a1d8870844fa2dfef54fbd82c4809cd162b9b58175eea44d6ae741c79cbd5ac24ce1cd29b196b86209f2b61640a9d27c9775a12b14cf30e1c79dd428d9d96926716834c1cb6a33dc9ca128d73b892f680563a8a85cfd2428e796df4232e95aed32b691bff73a37c7ae943ab98ed199d953e51be3ab265051d3e7d32c3b35925bdb6f82f92013760a88e8eccc1f2458f117e863b6f1477b4b81d21868ac0a1b38efcf85d2b148d77976561dcad6e6eef24584d037327bce7ac2ba044628ecd7c19ddb36c052e908026f0af20574e724a</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-default">
-      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-default">请输入密码访问</span>
-      </label>
+        <div class="password-protection-container">
+      <style>
+        .password-protection-container {
+          max-width: 100%;
+          margin: 50px auto;
+          padding: 20px;
+          text-align: center;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .password-protection-message {
+          font-size: 18px;
+          margin-bottom: 20px;
+          font-weight: bold;
+        }
+        .password-protection-input-container {
+          display: flex;
+          max-width: 400px;
+          margin: 0 auto;
+        }
+        #article-password {
+          flex: 1;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px 0 0 4px;
+          font-size: 16px;
+        }
+        #decrypt-button {
+          padding: 10px 15px;
+          background-color: #4a4a4a;
+          color: white;
+          border: none;
+          border-radius: 0 4px 4px 0;
+          cursor: pointer;
+          font-size: 16px;
+        }
+        #decrypt-button:hover {
+          background-color: #333;
+        }
+        .password-protection-error {
+          color: #e74c3c;
+          margin-top: 10px;
+          font-weight: bold;
+        }
+        .shake-animation {
+          animation: shake 0.5s;
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+      </style>
+      <div class="password-protection-message">这篇文章已加密，请输入密码访问。</div>
+      <form id="password-form" onsubmit="return validatePassword()">
+        <div class="password-protection-input-container">
+          <input type="password" id="article-password" placeholder="请输入密码" autocomplete="off" />
+          <button type="submit" id="decrypt-button">确认</button>
+        </div>
+      </form>
+      <div class="password-protection-error" style="display:none;">密码错误，请重试</div>
+      
+    <script>
+    // 存储正确密码和内容
+    const correctPassword = "365";
+    const renderedContent = "<span id=\"more\"></span>\n<h3 id=\"E02出1个剩2个，E03出2个剩1个\"><a href=\"#E02出1个剩2个，E03出2个剩1个\" class=\"headerlink\" title=\"E02出1个剩2个，E03出2个剩1个\"></a>E02出1个剩2个，E03出2个剩1个</h3><img src=\"/images/0414_21.png\">\n<div style=\"background: #f5f5f5; padding: 10px; border-radius: 5px; margin: 15px 0; font-size: 16px;\">\n</div>\n\n<img src=\"/images/0415_11.png\">\n<div style=\"background: #f5f5f5; padding: 10px; border-radius: 5px; margin: 15px 0; font-size: 16px;\">\n</div>\n\n<img src=\"/images/0415_21.png\">\n<div style=\"background: #f5f5f5; padding: 10px; border-radius: 5px; margin: 15px 0; font-size: 16px;\">\n</div>\n\n<h2 id=\"今日1个\"><a href=\"#今日1个\" class=\"headerlink\" title=\"今日1个\"></a>今日1个</h2><img src=\"/imagestem/0417.png\">\n<div style=\"background: #f5f5f5; padding: 10px; border-radius: 5px; margin: 15px 0; font-size: 16px;\">\n  <p>C 江苏新能</p>\n</div>\n";
+    
+    // 验证密码函数
+    function validatePassword() {
+      const passwordInput = document.getElementById('article-password');
+      const errorMessage = document.querySelector('.password-protection-error');
+      
+      // 获取密码
+      const password = passwordInput ? passwordInput.value.trim() : '';
+      
+      if (!password) {
+        if (errorMessage) {
+          errorMessage.style.display = 'block';
+          errorMessage.textContent = '请输入密码';
+        }
+        return false;
+      }
+      
+      // 验证密码 (严格比较)
+      if (password === correctPassword) {
+        // 密码正确，显示内容
+        const container = document.querySelector('.password-protection-container');
+        if (container) {
+          container.outerHTML = renderedContent;
+          
+          // 执行页面中的所有脚本
+          setTimeout(function() {
+            const scripts = document.querySelectorAll('script');
+            scripts.forEach(function(oldScript) {
+              if (!oldScript._executed) {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(function(attr) {
+                  newScript.setAttribute(attr.name, attr.value);
+                });
+                newScript.textContent = oldScript.textContent;
+                newScript._executed = true;
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+              }
+            });
+            
+            // 触发事件
+            document.dispatchEvent(new Event('content-updated'));
+            window.dispatchEvent(new Event('resize'));
+            window.dispatchEvent(new Event('load'));
+          }, 10);
+        }
+        return true;
+      } else {
+        // 密码错误
+        if (errorMessage) {
+          errorMessage.style.display = 'block';
+          errorMessage.textContent = '密码错误，请重试';
+          
+          // 震动效果
+          passwordInput.classList.add('shake-animation');
+          setTimeout(function() {
+            passwordInput.classList.remove('shake-animation');
+          }, 500);
+        }
+        return false;
+      }
+    }
+    
+    // 添加按钮事件处理
+    function setupEvents() {
+      const form = document.getElementById('password-form');
+      const decryptButton = document.getElementById('decrypt-button');
+      const passwordInput = document.getElementById('article-password');
+      
+      if (form) {
+        form.onsubmit = function(e) {
+          e.preventDefault();
+          validatePassword();
+          return false;
+        };
+      }
+      
+      if (decryptButton) {
+        decryptButton.onclick = function(e) {
+          e.preventDefault();
+          validatePassword();
+        };
+      }
+      
+      if (passwordInput) {
+        passwordInput.onkeydown = function(e) {
+          if (e.keyCode === 13) {
+            e.preventDefault();
+            validatePassword();
+          }
+        };
+        
+        // 自动聚焦
+        passwordInput.focus();
+      }
+    }
+    
+    // 页面加载时设置事件
+    document.addEventListener('DOMContentLoaded', setupEvents);
+    
+    // 如果页面已经加载，立即设置事件
+    if (document.readyState !== 'loading') {
+      setupEvents();
+    }
+    </script>
+    
     </div>
-  </div>
-</div>
-<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
     </div>
 
     
